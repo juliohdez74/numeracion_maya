@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Números mayas — práctica interactiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#1B241F;
+    --obsidian-2:#121913;
+    --limestone:#EDE6D6;
+    --limestone-2:#F8F4EA;
+    --jade:#2F6F5E;
+    --jade-dark:#1C4A3E;
+    --gold:#C9A227;
+    --cinnabar:#A6402E;
+    --ink:#2A2116;
+    --muted:#8FA79B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--obsidian);
+    color:var(--limestone-2);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  h1,h2{
+    font-family:'Bitter', serif;
+    margin:0;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:40px 20px 80px;
+  }
+  /* ---------- hero ---------- */
+  .hero{margin-bottom:36px;}
+  .hero h1{font-size:2.4rem; font-weight:700; color:var(--limestone-2);}
+  .hero .subtitle{
+    max-width:60ch;
+    color:var(--muted);
+    font-size:1.05rem;
+    margin:10px 0 28px;
+  }
+  .rules-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  .rule-card{
+    background:var(--limestone);
+    border-radius:6px;
+    padding:14px 10px 12px;
+    text-align:center;
+    color:var(--ink);
+  }
+  .rule-card svg{display:block; margin:0 auto 6px;}
+  .rule-card p{margin:0; font-size:0.9rem; font-weight:500;}
+  .rules-note{
+    color:var(--muted);
+    font-size:0.92rem;
+    margin-top:14px;
+    max-width:62ch;
+  }
+  /* ---------- tabs & difficulty ---------- */
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 26px;
+    border-bottom:1px solid rgba(255,255,255,0.12);
+    margin-bottom:16px;
+  }
+  .tab{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-family:'Work Sans', sans-serif;
+    font-size:0.98rem;
+    font-weight:500;
+    padding:10px 2px;
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+  }
+  .tab:hover{color:var(--limestone-2);}
+  .tab.active{color:var(--limestone-2); border-bottom-color:var(--gold);}
+  .difficulty{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    margin-bottom:28px;
+    font-size:0.88rem;
+    color:var(--muted);
+  }
+  .diff{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.2);
+    color:var(--muted);
+    border-radius:20px;
+    padding:5px 14px;
+    font-size:0.85rem;
+    cursor:pointer;
+    font-family:'Work Sans', sans-serif;
+  }
+  .diff.active{
+    background:var(--jade);
+    border-color:var(--jade);
+    color:var(--limestone-2);
+  }
+  /* ---------- practice card ---------- */
+  .card{
+    background:var(--limestone);
+    color:var(--ink);
+    border-radius:10px;
+    padding:28px 26px 30px;
+  }
+  .score-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.92rem;
+    color:var(--jade-dark);
+    margin-bottom:20px;
+    border-bottom:1px solid rgba(0,0,0,0.1);
+    padding-bottom:14px;
+  }
+  .problem{
+    display:flex;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+  .glyph-wrap{text-align:center;}
+  .glyph-cap{
+    font-size:0.78rem;
+    color:var(--jade-dark);
+    margin-bottom:4px;
+    letter-spacing:0.02em;
+  }
+  .glyph-svg{display:block; margin:0 auto;}
+  .op-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .op-sign{
+    font-size:2.2rem;
+    font-family:'Bitter', serif;
+    color:var(--cinnabar);
+  }
+  .big-number{
+    font-family:'Bitter', serif;
+    font-size:3.2rem;
+    text-align:center;
+    color:var(--ink);
+    font-weight:700;
+  }
+  .hint-text{
+    text-align:center;
+    color:var(--jade-dark);
+    font-size:0.92rem;
+    margin-top:4px;
+  }
+  .answer-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .answer-area label{
+    font-size:0.92rem;
+    color:var(--jade-dark);
+  }
+  .input-row{display:flex; gap:10px;}
+  input[type=number]{
+    font-family:'Work Sans', sans-serif;
+    font-size:1.05rem;
+    padding:9px 12px;
+    border:1px solid rgba(0,0,0,0.25);
+    border-radius:6px;
+    width:150px;
+    background:var(--limestone-2);
+    color:var(--ink);
+  }
+  input[type=number]:focus-visible, button:focus-visible{
+    outline:3px solid var(--gold);
+    outline-offset:2px;
+  }
+  .check-btn, .next-btn{
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    padding:9px 18px;
+    border-radius:6px;
+    border:none;
+    background:var(--jade);
+    color:var(--limestone-2);
+    cursor:pointer;
+  }
+  .check-btn:hover, .next-btn:hover{background:var(--jade-dark);}
+  .check-btn:disabled{opacity:0.5; cursor:default;}
+  .next-btn{margin:18px auto 0; display:block;}
+  .options-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .option-btn{
+    background:var(--limestone-2);
+    border:2px solid rgba(0,0,0,0.15);
+    border-radius:8px;
+    padding:8px 4px 6px;
+    cursor:pointer;
+  }
+  .option-btn:hover{border-color:var(--jade);}
+  .option-btn.correct{border-color:var(--jade); background:#E1EEE7;}
+  .option-btn.wrong{border-color:var(--cinnabar); background:#F3E1DD;}
+  .option-btn:disabled{cursor:default;}
+  .feedback{
+    min-height:24px;
+    text-align:center;
+    font-size:0.95rem;
+    margin-top:18px;
+    padding:0 6px;
+    transition:opacity 0.15s ease;
+  }
+  .feedback.ok{color:var(--jade-dark); font-weight:600;}
+  .feedback.bad{color:var(--cinnabar); font-weight:600;}
+  /* ---------- legend ---------- */
+  .legend{margin-top:34px;}
+  .legend-toggle{
+    background:none;
+    border:1px solid rgba(255,255,255,0.25);
+    color:var(--limestone-2);
+    border-radius:20px;
+    padding:8px 16px;
+    font-size:0.88rem;
+    cursor:pointer;
+    font-family:'Work Sans', sans-serif;
+  }
+  .legend-toggle:hover{border-color:var(--gold);}
+  .legend-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    margin-top:18px;
+    background:var(--limestone);
+    border-radius:10px;
+    padding:18px;
+  }
+  .ref-item{
+    text-align:center;
+    color:var(--ink);
+  }
+  .ref-label{
+    display:block;
+    margin-top:4px;
+    font-size:0.82rem;
+    color:var(--jade-dark);
+    font-weight:600;
+  }
+  @media (max-width:600px){
+    .rules-row{grid-template-columns:1fr;}
+    .options-grid{grid-template-columns:repeat(2,1fr);}
+    .legend-grid{grid-template-columns:repeat(4,1fr);}
+    .hero h1{font-size:1.9rem;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Números mayas</h1>
+    <p class="subtitle">Repasa cómo leer, escribir, sumar y restar cantidades con el sistema de numeración vigesimal maya. Cada respuesta te da retroalimentación al instante, con sonido incluido.</p>
+    <div class="rules-row" id="rulesRow"></div>
+    <p class="rules-note">Los glifos se escriben de abajo hacia arriba: el nivel inferior son las unidades (0 a 19) y cada nivel que sube vale 20 veces más que el anterior.</p>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-mode="dec">Leer un glifo</button>
+    <button class="tab" data-mode="maya">Escribir en maya</button>
+    <button class="tab" data-mode="sum">Sumas</button>
+    <button class="tab" data-mode="sub">Restas</button>
+  </nav>
+
+  <div class="difficulty" id="difficulty">
+    <span>Dificultad:</span>
+    <button class="diff active" data-level="1">Fácil · 0–19</button>
+    <button class="diff" data-level="2">Media · 0–399</button>
+    <button class="diff" data-level="3">Difícil · 0–7999</button>
+  </div>
+
+  <main class="card">
+    <div class="score-row">
+      <div>Aciertos: <strong id="score">0</strong>/<span id="total">0</span></div>
+      <div>Racha actual: <strong id="streak">0</strong></div>
+    </div>
+    <div class="problem" id="problemArea"></div>
+    <div class="answer-area" id="answerArea"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <button class="next-btn" id="nextBtn" style="display:none">Siguiente pregunta →</button>
+  </main>
+
+  <section class="legend">
+    <button class="legend-toggle" id="legendToggle">Ver guía de glifos del 0 al 19</button>
+    <div class="legend-grid" id="legendGrid" hidden></div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ========== conversión de números ========== */
+  function decToLevels(n){
+    if(n===0) return [0];
+    var levels=[], x=n;
+    while(x>0){ levels.unshift(x%20); x=Math.floor(x/20); }
+    return levels;
+  }
+  function levelsToDec(levels){
+    return levels.reduce(function(acc,d){ return acc*20+d; },0);
+  }
+
+  /* ========== dibujo de glifos ========== */
+  function levelGlyph(d, boxW, boxH){
+    if(d===0){
+      var cx=boxW/2, cy=boxH/2;
+      return '<ellipse cx="'+cx+'" cy="'+cy+'" rx="24" ry="15" fill="none" stroke="var(--cinnabar)" stroke-width="4"/>'+
+             '<path d="M '+(cx-15)+' '+cy+' Q '+cx+' '+(cy-12)+' '+(cx+15)+' '+cy+'" fill="none" stroke="var(--cinnabar)" stroke-width="3"/>'+
+             '<circle cx="'+(cx-15)+'" cy="'+cy+'" r="2.4" fill="var(--cinnabar)"/>'+
+             '<circle cx="'+(cx+15)+'" cy="'+cy+'" r="2.4" fill="var(--cinnabar)"/>';
+    }
+    var bars = Math.floor(d/5);
+    var dots = d % 5;
+    var rows = [];
+    if(dots>0) rows.push({type:'dots', n:dots});
+    for(var i=0;i<bars;i++) rows.push({type:'bar'});
+    var rowH = 22;
+    var totalRowsH = rows.length*rowH;
+    var startY = (boxH-totalRowsH)/2 + rowH/2;
+    var out='';
+    rows.forEach(function(row, idx){
+      var y = startY + idx*rowH;
+      if(row.type==='dots'){
+        var spacing=18;
+        var totalW=(row.n-1)*spacing;
+        var startX = boxW/2 - totalW/2;
+        for(var i2=0;i2<row.n;i2++){
+          out += '<circle cx="'+(startX+i2*spacing)+'" cy="'+y+'" r="6.2" fill="var(--gold)"/>';
+        }
+      } else {
+        out += '<rect x="'+(boxW/2-32)+'" y="'+(y-5)+'" width="64" height="10" rx="3" fill="var(--jade)"/>';
+      }
+    });
+    return out;
+  }
+
+  function buildGlyphSVG(n, opts){
+    opts = opts || {};
+    var boxW = opts.boxW || 100;
+    var boxH = opts.boxH || 100;
+    var gap = 6;
+    var levels = decToLevels(n);
+    var totalH = levels.length*boxH + (levels.length-1)*gap;
+    var inner='';
+    levels.forEach(function(d,i){
+      var y = i*(boxH+gap);
+      inner += '<g transform="translate(0,'+y+')">'+levelGlyph(d, boxW, boxH)+'</g>';
+      if(i < levels.length-1){
+        inner += '<line x1="4" y1="'+(y+boxH+gap/2)+'" x2="'+(boxW-4)+'" y2="'+(y+boxH+gap/2)+'" stroke="var(--jade-dark)" stroke-width="1" stroke-dasharray="4 4"/>';
+      }
+    });
+    return '<svg viewBox="0 0 '+boxW+' '+totalH+'" width="'+boxW+'" height="'+totalH+'" class="glyph-svg" role="img" aria-label="Glifo maya">'+
+      '<rect x="1" y="1" width="'+(boxW-2)+'" height="'+(totalH-2)+'" rx="10" fill="var(--limestone-2)" stroke="var(--jade-dark)" stroke-width="2"/>'+
+      inner+'</svg>';
+  }
+
+  /* ========== sonido ========== */
+  var audioCtx=null;
+  function getCtx(){
+    if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+    if(audioCtx.state==='suspended'){ audioCtx.resume(); }
+    return audioCtx;
+  }
+  function playNote(ctx, freq, startOffset, duration, type){
+    var t = ctx.currentTime + startOffset;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.28, t+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t+duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t+duration+0.03);
+  }
+  function playCorrect(){
+    var ctx=getCtx();
+    playNote(ctx,523.25,0,0.14,'sine');
+    playNote(ctx,659.25,0.09,0.16,'sine');
+    playNote(ctx,783.99,0.18,0.22,'sine');
+  }
+  function playIncorrect(){
+    var ctx=getCtx();
+    playNote(ctx,196.00,0,0.14,'triangle');
+    playNote(ctx,146.83,0.11,0.22,'triangle');
+  }
+
+  /* ========== estado de la app ========== */
+  var mode='dec';
+  var difficulty=1;
+  var maxByDifficulty={1:19,2:399,3:7999};
+  var score=0, total=0, streak=0, answered=false;
+  var currentProblem=null;
+
+  var problemArea=document.getElementById('problemArea');
+  var answerArea=document.getElementById('answerArea');
+  var feedbackEl=document.getElementById('feedback');
+  var nextBtn=document.getElementById('nextBtn');
+  var scoreEl=document.getElementById('score');
+  var totalEl=document.getElementById('total');
+  var streakEl=document.getElementById('streak');
+
+  function randInt(max){ return Math.floor(Math.random()*(max+1)); }
+  function shuffle(arr){
+    for(var i=arr.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1));
+      var tmp=arr[i]; arr[i]=arr[j]; arr[j]=tmp;
+    }
+    return arr;
+  }
+
+  function makeDistractors(correctN, levels, count){
+    var set = {}; set[correctN]=true;
+    var distractors=[];
+    if(levels.length>1){
+      var reversed=levels.slice().reverse();
+      var revN=levelsToDec(reversed);
+      if(!set[revN]){ set[revN]=true; distractors.push(reversed); }
+    }
+    var attempts=0;
+    while(distractors.length<count && attempts<60){
+      attempts++;
+      var idx=Math.floor(Math.random()*levels.length);
+      var deltas=[-3,-2,-1,1,2,3];
+      var delta=deltas[Math.floor(Math.random()*deltas.length)];
+      var newLevels=levels.slice();
+      var val=newLevels[idx]+delta;
+      val=Math.max(0, Math.min(19,val));
+      newLevels[idx]=val;
+      var n=levelsToDec(newLevels);
+      if(!set[n]){ set[n]=true; distractors.push(newLevels); }
+    }
+    while(distractors.length<count){
+      var randN=randInt(Math.pow(20,levels.length)-1);
+      if(!set[randN]){ set[randN]=true; distractors.push(decToLevels(randN)); }
+    }
+    return distractors.slice(0,count);
+  }
+
+  function decompositionText(levels, n){
+    if(levels.length===1){ return 'Este glifo tiene un solo nivel, así que vale '+n+' directamente.'; }
+    var parts = levels.map(function(d,i){
+      var power = levels.length-1-i;
+      return d+'×20^'+power;
+    });
+    return parts.join(' + ')+' = '+n;
+  }
+
+  /* ========== generación de problemas ========== */
+  function newDecProblem(){
+    var max=maxByDifficulty[difficulty];
+    var n=randInt(max);
+    return {type:'dec', n:n, correct:n, levels:decToLevels(n)};
+  }
+  function newMayaProblem(){
+    var max=maxByDifficulty[difficulty];
+    var n=randInt(max);
+    var levels=decToLevels(n);
+    var distractors=makeDistractors(n, levels, 3);
+    var options=[{levels:levels, n:n, correct:true}];
+    distractors.forEach(function(l){ options.push({levels:l, n:levelsToDec(l), correct:false}); });
+    shuffle(options);
+    return {type:'maya', n:n, levels:levels, options:options};
+  }
+  function newSumProblem(){
+    var max=maxByDifficulty[difficulty];
+    var half=Math.max(1, Math.floor(max/2));
+    var a=randInt(half), b=randInt(half);
+    return {type:'sum', a:a, b:b, correct:a+b, levelsA:decToLevels(a), levelsB:decToLevels(b)};
+  }
+  function newSubProblem(){
+    var max=maxByDifficulty[difficulty];
+    var a=randInt(max);
+    var b=randInt(a);
+    return {type:'sub', a:a, b:b, correct:a-b, levelsA:decToLevels(a), levelsB:decToLevels(b)};
+  }
+
+  function generateProblem(){
+    if(mode==='dec') currentProblem=newDecProblem();
+    else if(mode==='maya') currentProblem=newMayaProblem();
+    else if(mode==='sum') currentProblem=newSumProblem();
+    else currentProblem=newSubProblem();
+    renderProblem();
+  }
+
+  /* ========== render ========== */
+  function renderProblem(){
+    answered=false;
+    feedbackEl.textContent='';
+    feedbackEl.className='feedback';
+    nextBtn.style.display='none';
+    var p=currentProblem;
+
+    if(p.type==='dec'){
+      problemArea.innerHTML='<div class="glyph-wrap">'+buildGlyphSVG(p.n,{})+'</div>';
+      answerArea.innerHTML=
+        '<label for="numInput">¿Qué número decimal representa este glifo?</label>'+
+        '<div class="input-row">'+
+          '<input type="number" id="numInput" min="0" placeholder="Tu respuesta">'+
+          '<button id="checkBtn" class="check-btn">Comprobar</button>'+
+        '</div>';
+      wireNumericInput(p.correct, decompositionText(p.levels, p.n));
+
+    } else if(p.type==='maya'){
+      problemArea.innerHTML='<div class="big-number">'+p.n+'</div><p class="hint-text">Elige el glifo maya que representa este número.</p>';
+      answerArea.innerHTML='<div class="options-grid">'+
+        p.options.map(function(opt,i){
+          return '<button class="option-btn" data-idx="'+i+'">'+buildGlyphSVG(opt.n,{boxW:90,boxH:90})+'</button>';
+        }).join('')+
+        '</div>';
+      wireOptionButtons(p);
+
+    } else if(p.type==='sum' || p.type==='sub'){
+      var sign = p.type==='sum' ? '+' : '−';
+      problemArea.innerHTML=
+        '<div class="op-row">'+
+          '<div class="glyph-wrap"><div class="glyph-cap">A</div>'+buildGlyphSVG(p.a,{})+'</div>'+
+          '<div class="op-sign">'+sign+'</div>'+
+          '<div class="glyph-wrap"><div class="glyph-cap">B</div>'+buildGlyphSVG(p.b,{})+'</div>'+
+        '</div>';
+      answerArea.innerHTML=
+        '<label for="numInput">¿Cuál es el resultado, en decimal?</label>'+
+        '<div class="input-row">'+
+          '<input type="number" id="numInput" min="0" placeholder="Tu respuesta">'+
+          '<button id="checkBtn" class="check-btn">Comprobar</button>'+
+        '</div>';
+      var opWord = p.type==='sum' ? '+' : '−';
+      wireNumericInput(p.correct, 'A vale '+p.a+' y B vale '+p.b+', así que '+p.a+' '+opWord+' '+p.b+' = '+p.correct+'.');
+    }
+  }
+
+  function showFeedback(isCorrect, text){
+    feedbackEl.textContent=text;
+    feedbackEl.className='feedback '+(isCorrect ? 'ok' : 'bad');
+  }
+  function updateScoreUI(){
+    scoreEl.textContent=score;
+    totalEl.textContent=total;
+    streakEl.textContent=streak;
+  }
+
+  function wireNumericInput(correctVal, explanation){
+    var input=document.getElementById('numInput');
+    var btn=document.getElementById('checkBtn');
+    function check(){
+      if(answered) return;
+      var val=parseInt(input.value,10);
+      if(isNaN(val)){ input.focus(); return; }
+      answered=true;
+      btn.disabled=true;
+      input.disabled=true;
+      total++;
+      if(val===correctVal){
+        score++; streak++;
+        showFeedback(true, '¡Correcto! '+explanation);
+        playCorrect();
+      } else {
+        streak=0;
+        showFeedback(false, 'No es correcto — la respuesta era '+correctVal+'. '+explanation);
+        playIncorrect();
+      }
+      updateScoreUI();
+      nextBtn.style.display='inline-block';
+      nextBtn.focus();
+    }
+    btn.addEventListener('click', check);
+    input.addEventListener('keydown', function(e){ if(e.key==='Enter') check(); });
+    input.focus();
+  }
+
+  function wireOptionButtons(p){
+    var buttons=answerArea.querySelectorAll('.option-btn');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(answered) return;
+        answered=true;
+        total++;
+        var idx=parseInt(btn.getAttribute('data-idx'),10);
+        var opt=p.options[idx];
+        buttons.forEach(function(b){ b.disabled=true; });
+        if(opt.correct){
+          btn.classList.add('correct');
+          score++; streak++;
+          showFeedback(true, '¡Correcto! '+decompositionText(p.levels, p.n));
+          playCorrect();
+        } else {
+          btn.classList.add('wrong');
+          buttons.forEach(function(b,i2){ if(p.options[i2].correct) b.classList.add('correct'); });
+          streak=0;
+          showFeedback(false, 'No es correcto. '+decompositionText(p.levels, p.n));
+          playIncorrect();
+        }
+        updateScoreUI();
+        nextBtn.style.display='inline-block';
+        nextBtn.focus();
+      });
+    });
+  }
+
+  /* ========== referencia (hero + leyenda) ========== */
+  function buildRulesRow(){
+    var container=document.getElementById('rulesRow');
+    container.innerHTML=
+      '<div class="rule-card">'+buildGlyphSVG(1,{boxW:70,boxH:70})+'<p>Un punto vale 1</p></div>'+
+      '<div class="rule-card">'+buildGlyphSVG(5,{boxW:70,boxH:70})+'<p>Una barra vale 5</p></div>'+
+      '<div class="rule-card">'+buildGlyphSVG(0,{boxW:70,boxH:70})+'<p>La concha vale 0</p></div>';
+  }
+
+  var legendBuilt=false;
+  function buildLegend(){
+    var grid=document.getElementById('legendGrid');
+    var html='';
+    for(var i=0;i<=19;i++){
+      html+='<div class="ref-item">'+buildGlyphSVG(i,{boxW:64,boxH:64})+'<span class="ref-label">'+i+'</span></div>';
+    }
+    grid.innerHTML=html;
+    legendBuilt=true;
+  }
+
+  /* ========== eventos ========== */
+  document.getElementById('tabs').addEventListener('click', function(e){
+    var btn=e.target.closest('.tab');
+    if(!btn) return;
+    document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    mode=btn.getAttribute('data-mode');
+    generateProblem();
+  });
+
+  document.getElementById('difficulty').addEventListener('click', function(e){
+    var btn=e.target.closest('.diff');
+    if(!btn) return;
+    document.querySelectorAll('.diff').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    difficulty=parseInt(btn.getAttribute('data-level'),10);
+    generateProblem();
+  });
+
+  nextBtn.addEventListener('click', generateProblem);
+
+  document.getElementById('legendToggle').addEventListener('click', function(){
+    var grid=document.getElementById('legendGrid');
+    var willShow = grid.hasAttribute('hidden');
+    if(willShow && !legendBuilt) buildLegend();
+    if(willShow){ grid.removeAttribute('hidden'); this.textContent='Ocultar guía de glifos'; }
+    else{ grid.setAttribute('hidden',''); this.textContent='Ver guía de glifos del 0 al 19'; }
+  });
+
+  /* ========== inicio ========== */
+  buildRulesRow();
+  generateProblem();
+
+})();
+</script>
+</body>
+</html>
